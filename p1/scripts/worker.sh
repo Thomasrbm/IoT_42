@@ -7,6 +7,14 @@ WORKER_IP="${WORKER_IP:-192.168.56.111}"
 
 
 apt-get update -y || true
+apt-get install -y curl 
+
+
+
+echo "Waiting for eth1 to be ready..."
+until ip a show eth1 | grep -q "${WORKER_IP}"; do
+  sleep 1
+done
 
 
 echo "Waiting for server token..."

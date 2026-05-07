@@ -12,6 +12,17 @@ SERVER_IP="${SERVER_IP:-192.168.56.110}" # use server ip sinon fall back sur ip 
 
 
 apt-get update -y || true # maj packet si erreur true skip l erreur
+apt-get install -y curl 
+
+
+
+# Attendre que eth1 soit prête avec la bonne IP
+echo "Waiting for eth1 to be ready..."
+until ip a show eth1 | grep -q "${SERVER_IP}"; do
+  sleep 1
+done
+
+
 
 # isntall k3s
 curl -sfL https://get.k3s.io | sh -s - server \
