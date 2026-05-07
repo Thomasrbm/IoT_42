@@ -1,0 +1,46 @@
+# ===== Vagrant =====
+.vagrant/
+*.box
+ubuntu-*-cloudimg-console.log
+
+# ===== Fichiers partagés générés au runtime =====
+**/shared/
+**/confs/k3s.yaml
+**/confs/node-token
+
+# ===== VirtualBox =====
+*.vdi
+*.vmdk
+*.vbox
+*.vbox-prev
+*.vbox-tmp
+
+# ===== Kubernetes =====
+kubeconfig
+*.kubeconfig
+.kube/
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Éditeurs =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ===== Système =====
+Thumbs.db
+desktop.ini
+
+# ===== Secrets (au cas où) =====
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+.env
+.env.local
+secrets/
