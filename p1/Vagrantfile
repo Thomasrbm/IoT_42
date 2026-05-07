@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# lance la config version 2.x.x
+# vrai code entre le do et le end 
+Vagrant.configure("2") do |config|
+
+  # iso de l os : niveau config s applique a TOUS
+  config.vm.box = "debian/bookworm64"
+
+  # commun aussi
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 1024
+    vb.cpus   = 1
+  end
+
+  # definition d une vm 
+  # define s applique a UNE SEULE
+  config.vm.define "throbertS" do |v|  # v = objet de la vm
+      v.vm.hostname = "throbertS"
+      v.vm.network "private_network", ip: "192.168.56.110"
+      v.vm.provision "shell", path: "scripts/server.sh" # equivalent du RUN de docker. exec cmd que au build
+  end
+
+
+  config.vm.define "garsideSW" do |v|
+    v.vm.hostname = "garsideSW"
+    v.vm.network "private_network", ip: "192.168.56.111"
+    v.vm.provision "shell", path: "scripts/worker.sh"
+  end
+
+end

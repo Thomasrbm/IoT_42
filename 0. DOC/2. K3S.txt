@@ -1,0 +1,40 @@
+
+
+c est une distribution de kubernetese
+
+
+le meme code mais packaged differement.
+
+
+
+
+
+lightweight, prend peut de place, et tres compatible
+Secured by default avec best practices 
+
+
+Fait par Rancher. 
+
+
+
+Single binary, cross compilled for ARM 
+
+
+
+
+
+
+k3s Prend TOUS les services Kubernetes et les packet en 1 binaire.
+
+
+
+
+used pour IOT (internet of things : orchestrer domotique, indutriel, medical, wearables etc)
+
+
+
+
+Machine réelle (ou VM)
+└── systemd
+    └── k3s.service (UN SEUL processus)
+        └── Tous les composants K8s embarqués dedans

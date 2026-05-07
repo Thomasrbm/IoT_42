@@ -1,0 +1,16 @@
+
+
+Fichiers de config declarative pour setup auto 
+de multiples vm
+
+
+coded en Ruby
+
+
+USE : 
+
+dans une fichier faire : vagrant init cree un fichier template
+
+vagrant up
+
+vagrant destroy 

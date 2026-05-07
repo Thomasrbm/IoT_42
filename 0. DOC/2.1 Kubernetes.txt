@@ -1,0 +1,34 @@
+
+
+Projet open source qui definit : 
+
+
+API d orchestration de conteneur
+Des composant en complement
+Format de config YAML
+
+
+
+
+les services : 
+
+
+Kubernetes (upstream) =
+  ├── kube-apiserver       ← le serveur central
+  ├── kube-controller-manager  ← surveille l'état du cluster
+  ├── kube-scheduler        ← décide où placer les pods
+  ├── etcd                 ← base de données du cluster
+  ├── kubelet              ← agent sur chaque node
+  ├── kube-proxy           ← gère le réseau
+  └── un CNI (Calico, Flannel...)  ← réseau des pods
+
+
+
+
+
+
+
+
+
+
+  

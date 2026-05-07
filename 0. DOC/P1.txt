@@ -1,0 +1,32 @@
+
+
+
+2vm vagrant file
+
+
+
+Server avec k3s mode controller
+
+
+ServerWorker  k3s agent mode 
+
+
+
+
+
+
+Pour rentrer dedans   vagrant ssh + nom vm
+
+
+doit etre dans le dossier du vagrantfile car y a un environnement
+vagrant .vagrant requis pour rentrer.
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+
+
+
+vagrant :  https://developer.hashicorp.com/vagrant/docs
+
+
+
+k3s : https://docs.k3s.io/
+
+
+kubernetes :  https://kubernetes.io/docs/concepts/
+
+
+Ingress : https://doc.traefik.io/traefik/providers/kubernetes-ingress/
+
+
+K3d :  https://k3d.io/
+
+
+ArgoCD :  https://argo-cd.readthedocs.io/
+
+
+
+Helm + GitLab :  https://helm.sh/docs/
+
+
+
+Wil :  https://hub.docker.com/r/wil42/playground
