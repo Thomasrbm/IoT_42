@@ -30,3 +30,38 @@ vagrant .vagrant requis pour rentrer.
 
 
 
+throbertS (192.168.56.110)              garsideSW (192.168.56.111)
+─────────────────────────                ──────────────────────────
+1. Installe K3s en mode server           1. Récupère le token du server
+2. Génère un token de join               2. Installe K3s en mode agent
+3. Démarre l'API Kubernetes              3. Se connecte à throbertS:6443
+4. Met le token quelque part             4. Rejoint le cluster
+   accessible au worker
+
+
+
+
+
+
+TOKEN : 
+
+mdp partage a tous les node pour que k3s identifie les agent
+qui veulent join le server.
+
+sans ce secret tout le monde pourrait join le cluster.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

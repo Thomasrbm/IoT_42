@@ -1,0 +1,193 @@
+
+
+Projet open source qui definit : 
+
+
+API d orchestration de conteneur
+Des composant en complement
+Format de config YAML
+
+
+
+
+les services : 
+
+
+Kubernetes (upstream) =
+  ├── kube-apiserver       ← le serveur central
+  ├── kube-controller-manager  ← surveille l'état du cluster
+  ├── kube-scheduler        ← décide où placer les pods
+  ├── etcd                 ← base de données du cluster
+  ├── kubelet              ← agent sur chaque node
+  ├── kube-proxy           ← gère le réseau
+  └── un CNI (Calico, Flannel...)  ← réseau des pods
+
+
+
+
+
+
+chaque container est isole dans son node et partage jute
+le meme kernel mais ne se parle pas.
+
+
+
+Kubernetes permet dans gerer de multiples nodes avec 
+de multiples pods (qui ont potentiellement de multiples 
+container)
+
+
+
+
+NODE :   machine physique
+
+
+PODS :  1 ou plus  container
+
+
+CONTAINER : vrai container, docker etc.
+
+
+
+
+
+
+
+
+
+
+============ CLI : Kubctl
+
+
+
+======================= ORGA 
+
+Y a un MASTER des des NODES
+
+
+======= API REST = kube-apiserver   
+
+
+ indique les routes 
+  REST : Requetes HTTP +  url +  manip pods, users etc.
+
+manip en json en general.
+
+
+ex : GET    /api/v1/namespaces/default/pods           → liste tous les pods
+
+======= etcd  = db du server
+
+stock etat des pods, configureations, secrets,
+location des pods.
+
+
+======= Scheduler : kube-scheduler
+
+
+a la creation les pods sont pending.
+
+le scheduleur decide dans quel node il sera placed selon si il 
+est le plus approprie pour y placer le node 
+(place Ram/cpu) selon les contraintes
+
+
+
+
+
+======= Controller Manager :  kube-controller-manager
+
+
+il execute en fond des "goroutine" en go
+
+
+
+
+
+elle check l etat desire et l etat reel.
+font une differement
+
+font les action pour rapproche la plus l une de l autre.
+
+
+
+
+
+
+
+===================== Fonctionnement des 3 ensemble
+
+
+tous passe par l API 
+
+
+scheduler et controller manager demande a l api 
+
+api envoit modif a etcd
+
+
+
+
+et nous on parle via kubctl le CLI a l API
+
+
+
+
+
+=======
+
+┌─────────────────────────────────────────────────────┐
+│ CONTROL PLANE (Master)                              │
+│                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
+│  │ API      │  │ Scheduler│  │ Controller       │   │
+│  │ Server   │  │          │  │ Manager          │   │
+│  └────┬─────┘  └────┬─────┘  └────┬─────────────┘   │
+│       │             │             │                 │
+│       └─────────────┴─────────────┘                 │
+│                     │                               │
+│                ┌────▼────┐                          │
+│                │  etcd   │  (la BDD du cluster)     │
+│                └─────────┘                          │
+└─────────────────────────────────────────────────────┘
+              │
+              │ ordres / status
+              │
+┌─────────────▼──────────────────────────────────────┐
+│ DATA PLANE                                         │
+│                                                    │
+│  ┌──────────────┐  ┌──────────────┐                │
+│  │   Node 1     │  │   Node 2     │   ...          │
+│  │              │  │              │                │
+│  │  ┌─────────┐ │  │  ┌─────────┐ │                │
+│  │  │ kubelet │ │  │  │ kubelet │ │ ← agents       │
+│  │  └─────────┘ │  │  └─────────┘ │                │
+│  │              │  │              │                │
+│  │  ┌──┐ ┌──┐   │  │  ┌──┐ ┌──┐   │                │
+│  │  │P1│ │P2│   │  │  │P3│ │P4│   │ ← Pods         │
+│  │  └──┘ └──┘   │  │  └──┘ └──┘   │                │
+│  └──────────────┘  └──────────────┘                │
+└────────────────────────────────────────────────────┘
+
+
+
+
+
+================ kubelet
+
+
+c est un daemon qui :
+
+- renvoit l etat des nodes a l api
+- executer les pods (configure, mount, secret etc)
+  
+
+
+
+
+
+
+================== Kube-proxy
+
+gerer la compatibilite reseau par nom de service et 
+pas uniquement par ip
