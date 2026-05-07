@@ -10,9 +10,12 @@ Vagrant.configure("2") do |config|
 
   # commun aussi
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = 1024
+    vb.memory = 2048
     vb.cpus   = 1
+    
   end
+
+
 
   # definition d une vm 
   # define s applique a UNE SEULE

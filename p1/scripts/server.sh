@@ -66,4 +66,3 @@ chmod 644 /vagrant/shared/k3s.yaml
 
 
 echo "=== K3s server ready ==="
-kubectl get nodes # 
