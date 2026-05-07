@@ -1,0 +1,23 @@
+
+
+
+
+sudo systemctl status k3s
+
+
+OU 
+
+
+sudo systemctl status k3s-agent
+
+
+
+
+
+
+which k3s
+k3s --version
+
+
+ps aux | grep k3s | grep -v grep
+sudo ss -tlnp | grep 6443

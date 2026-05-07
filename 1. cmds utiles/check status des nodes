@@ -1,0 +1,8 @@
+
+
+
+
+ vagrant ssh throbertS -c "kubectl get nodes"
+
+
+ vagrant ssh throbertS -c "kubectl get nodes -o wide"

@@ -1,0 +1,5 @@
+kubectl get nodes -o wide
+
+
+
+dans la vm  vagrant ssh throbertS
