@@ -6,7 +6,7 @@
 Vagrant.configure("2") do |config|
 
   # iso de l os : niveau config s applique a TOUS
-  config.vm.box = "debian/bookworm64"
+  config.vm.box = "debian/trixie64"
 
   # commun aussi
   config.vm.provider "virtualbox" do |vb|
