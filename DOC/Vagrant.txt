@@ -1,0 +1,16 @@
+
+
+
+Outil d automatisation de VM a partir d un fichier de config.
+
+
+
+Le vagrantfile decrit tout et execute.
+
+
+
+vagrant up.
+
+
+
+code en Ruby
