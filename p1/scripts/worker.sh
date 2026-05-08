@@ -28,6 +28,8 @@ done
 K3S_TOKEN="$(cat /vagrant/shared/node-token)"
 
 
+
+
 # k3s mode agent
 curl -sfL https://get.k3s.io | \
   K3S_URL="https://${SERVER_IP}:6443" \

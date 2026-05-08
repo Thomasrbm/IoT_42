@@ -8,6 +8,8 @@ down:
 
 clean:
 	vagrant destroy -f
+	rm -Rf shared .vagrant
+
 
 fclean: clean
 	rm -rf .vagrant/

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # setup-iot.sh - Installe les outils IoT dans sgoinfre + configure VirtualBox
-# Usage : ./setup-iot.sh
+# Usage : ./setup-iot.sh [--force]
 # Idempotent : peut être relancé sans casser l'existant
 
 set -e
@@ -26,69 +26,103 @@ mkdir -p "$BIN" "$TMP"
 mkdir -p "$SGOINFRE/.vagrant.d"
 mkdir -p "$SGOINFRE/.VirtualBox"
 mkdir -p "$SGOINFRE/VirtualBox_VMs"
+
 cd "$TMP"
 
 # ==== Outils CLI ====
 echo "=== Vagrant ==="
 if [ ! -f "$BIN/vagrant" ] || [ "$1" = "--force" ]; then
-  curl -LO "https://releases.hashicorp.com/vagrant/${VAGRANT_VERSION}/vagrant_${VAGRANT_VERSION}_linux_amd64.zip"
-  unzip -o "vagrant_${VAGRANT_VERSION}_linux_amd64.zip"
-  mv vagrant "$BIN/"
-  chmod +x "$BIN/vagrant"
+    curl -LO "https://releases.hashicorp.com/vagrant/${VAGRANT_VERSION}/vagrant_${VAGRANT_VERSION}_linux_amd64.zip"
+    unzip -o "vagrant_${VAGRANT_VERSION}_linux_amd64.zip"
+    mv vagrant "$BIN/"
+    chmod +x "$BIN/vagrant"
 else
-  echo "  → already installed, skipping (use --force to reinstall)"
+    echo "  → already installed, skipping (use --force to reinstall)"
 fi
 
 echo "=== kubectl ==="
 if [ ! -f "$BIN/kubectl" ] || [ "$1" = "--force" ]; then
-  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-  mv kubectl "$BIN/"
-  chmod +x "$BIN/kubectl"
+    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+    mv kubectl "$BIN/"
+    chmod +x "$BIN/kubectl"
 else
-  echo "  → already installed, skipping"
+    echo "  → already installed, skipping"
 fi
 
 echo "=== k3d ==="
 if [ ! -f "$BIN/k3d" ] || [ "$1" = "--force" ]; then
-  curl -L "https://github.com/k3d-io/k3d/releases/download/${K3D_VERSION}/k3d-linux-amd64" -o "$BIN/k3d"
-  chmod +x "$BIN/k3d"
+    curl -L "https://github.com/k3d-io/k3d/releases/download/${K3D_VERSION}/k3d-linux-amd64" -o "$BIN/k3d"
+    chmod +x "$BIN/k3d"
 else
-  echo "  → already installed, skipping"
+    echo "  → already installed, skipping"
 fi
 
 echo "=== Helm ==="
 if [ ! -f "$BIN/helm" ] || [ "$1" = "--force" ]; then
-  curl -LO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
-  tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz"
-  mv linux-amd64/helm "$BIN/"
-  chmod +x "$BIN/helm"
+    curl -LO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+    tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz"
+    mv linux-amd64/helm "$BIN/"
+    chmod +x "$BIN/helm"
 else
-  echo "  → already installed, skipping"
+    echo "  → already installed, skipping"
 fi
 
 echo "=== Argo CD CLI ==="
 if [ ! -f "$BIN/argocd" ] || [ "$1" = "--force" ]; then
-  curl -L "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o "$BIN/argocd"
-  chmod +x "$BIN/argocd"
+    curl -L "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64" -o "$BIN/argocd"
+    chmod +x "$BIN/argocd"
 else
-  echo "  → already installed, skipping"
+    echo "  → already installed, skipping"
 fi
 
-# ==== VirtualBox machinefolder (CRITIQUE) ====
+# ==== Activer env vars pour la session courante ====   # NEW
+# Indispensable parce que .zshrc/.bashrc ne sera lu qu'au prochain shell,
+# or on a besoin de vagrant + VAGRANT_HOME maintenant pour pré-télécharger la box.
+export PATH="$BIN:$PATH"                                # NEW
+export VAGRANT_HOME="$SGOINFRE/.vagrant.d"              # NEW
+export VBOX_USER_HOME="$SGOINFRE/.VirtualBox"           # NEW
+
+# ==== VirtualBox machinefolder ====
 echo ""
 echo "=== Configuring VirtualBox machinefolder ==="
 if command -v VBoxManage >/dev/null 2>&1; then
-  CURRENT_FOLDER=$(VBoxManage list systemproperties 2>/dev/null | grep "Default machine folder" | awk -F: '{print $2}' | xargs)
-  TARGET_FOLDER="$SGOINFRE/VirtualBox_VMs"
-  
-  if [ "$CURRENT_FOLDER" != "$TARGET_FOLDER" ]; then
-    VBoxManage setproperty machinefolder "$TARGET_FOLDER"
-    echo "  → set to $TARGET_FOLDER"
-  else
-    echo "  → already set to $TARGET_FOLDER"
-  fi
+    CURRENT_FOLDER=$(VBoxManage list systemproperties 2>/dev/null | grep "Default machine folder" | awk -F: '{print $2}' | xargs)
+    TARGET_FOLDER="$SGOINFRE/VirtualBox_VMs"
+
+    if [ "$CURRENT_FOLDER" != "$TARGET_FOLDER" ]; then
+        VBoxManage setproperty machinefolder "$TARGET_FOLDER"
+        echo "  → set to $TARGET_FOLDER"
+    else
+        echo "  → already set to $TARGET_FOLDER"
+    fi
 else
-  echo "  → VBoxManage not found (VirtualBox not installed?), skipping"
+    echo "  → VBoxManage not found (VirtualBox not installed?), skipping"
+fi
+
+
+# ==== Vagrant plugin: cachier ====
+echo ""
+echo "=== Vagrant plugin: vagrant-cachier ==="
+if vagrant plugin list 2>/dev/null | grep -q "^vagrant-cachier"; then
+    echo "  → already installed, skipping"
+else
+    vagrant plugin install vagrant-cachier
+fi
+
+# ==== Vagrant box bento/debian-13 ====                 # NEW
+echo ""
+echo "=== Vagrant box: bento/debian-13 (Debian 13 Trixie) ==="
+if vagrant box list 2>/dev/null | grep -q "bento/debian-13.*virtualbox"; then
+    if [ "$1" = "--force" ]; then
+        echo "  → --force: removing existing box"
+        vagrant box remove bento/debian-13 --provider=virtualbox --force 2>/dev/null || true
+        vagrant box add bento/debian-13 --provider=virtualbox
+    else
+        echo "  → already present in \$VAGRANT_HOME, skipping"
+    fi
+else
+    echo "  → downloading to $VAGRANT_HOME..."
+    vagrant box add bento/debian-13 --provider=virtualbox
 fi
 
 # ==== Cleanup ====
@@ -100,18 +134,17 @@ SHELL_RC="$HOME/.bashrc"
 [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
 
 if ! grep -q "IoT project" "$SHELL_RC" 2>/dev/null; then
-  cat >> "$SHELL_RC" <<EOF
-
+    cat >> "$SHELL_RC" <<EOF
 # === IoT project (added by setup-iot.sh) ===
 export PATH="$BIN:\$PATH"
 export VAGRANT_HOME="$SGOINFRE/.vagrant.d"
 export VBOX_USER_HOME="$SGOINFRE/.VirtualBox"
 EOF
-  echo ""
-  echo "→ Added env vars to $SHELL_RC"
+    echo ""
+    echo "→ Added env vars to $SHELL_RC"
 else
-  echo ""
-  echo "→ Env vars already in $SHELL_RC, skipping"
+    echo ""
+    echo "→ Env vars already in $SHELL_RC, skipping"
 fi
 
 # ==== Final ====
@@ -125,6 +158,9 @@ ls -lh "$BIN"
 echo ""
 echo "VirtualBox machinefolder:"
 VBoxManage list systemproperties 2>/dev/null | grep "Default machine folder" || echo "  (VBox not available)"
+echo ""
+echo "Vagrant boxes:"                                    # NEW
+vagrant box list 2>/dev/null || echo "  (none)"          # NEW
 echo ""
 echo "Next steps:"
 echo "  1. Reload your shell: source $SHELL_RC"
