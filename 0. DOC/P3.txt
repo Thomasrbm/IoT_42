@@ -1,0 +1,32 @@
+
+
+
+1 VM avec des docker  et orchestration k3d
+
+
+
+au lieu d avoir une vm avec k3s, c est une vm et des docker 
+dans lequel ya k3s
+
+
+
+ArgoCD
+
+
+ IoT_42  en repo de dev
+
+ un repo dedie a la maj de l application => sera update en live par ArgoCD
+
+
+
+creation d un dockerhub repository et push une docker image de lapp
+avec v1 et v2
+
+
+
+
+
+
+
+
+
