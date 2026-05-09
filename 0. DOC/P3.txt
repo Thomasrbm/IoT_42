@@ -29,4 +29,16 @@ avec v1 et v2
 
 
 
+CREER LES IMAGES DOCKER : 
+
+
+cd /home/throbert/Desktop/Code/IoT_42/p3/index     
+
+docker login
+docker build --build-arg VERSION=v1 -t thomasrbm/iot_app:v1 .
+docker build --build-arg VERSION=v2 -t thomasrbm/iot_app:v2 .
+docker push thomasrbm/iot_app:v1
+docker push thomasrbm/iot_app:v2
+
+
 
