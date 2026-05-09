@@ -44,3 +44,7 @@ desktop.ini
 .env
 .env.local
 secrets/
+
+git rm --cached p2/app1/app1-web.tar
+git rm --cached p2/app2/app2-web.tar
+git rm --cached p2/app3/app3-web.tar
