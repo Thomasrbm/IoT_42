@@ -1,12 +1,33 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "base"
+	# image Debian utilisée pour la VM
+	config.vm.box = "bento/debian-13"
 
+	# définition de la VM
+	config.vm.define "garsideS" do |vm|
+
+		# nom de la machine
+		vm.vm.hostname = "garsideS"
+
+		# IP fixe demandée par le sujet
+		vm.vm.network "private_network", ip: "192.168.56.110"
+
+		config.vm.network "forwarded_port", guest: 8080, host: 8080
+
+		# lance le script server.sh
+		vm.vm.provision "shell",
+			path: "scripts/server.sh",
+			env: {
+				"SERVER_IP" => "192.168.56.110"
+			}
+
+		# ressources VM
+		vm.vm.provider "virtualbox" do |vb|
+			vb.memory = 2048
+			vb.cpus = 2
+		end
+	end
 end
