@@ -1,34 +1,3 @@
-
-
-
-1 VM avec des docker  et orchestration k3d
-
-
-
-au lieu d avoir une vm avec k3s, c est une vm et des docker 
-dans lequel ya k3s
-
-
-
-ArgoCD
-
-
- IoT_42  en repo de dev
-
- un repo dedie a la maj de l application => sera update en live par ArgoCD
-
-
-
-creation d un dockerhub repository et push une docker image de lapp
-avec v1 et v2
-
-
-
-
-
-
-
-
 CREER LES IMAGES DOCKER : 
 
 
@@ -40,5 +9,137 @@ docker build --build-arg VERSION=v2 -t thomasrbm/iot_app:v2 .
 docker push thomasrbm/iot_app:v1
 docker push thomasrbm/iot_app:v2
 
+
+
+
+
+
+
+
+================ FONCTIONNEMENT ================================
+
+
+
+
+                    ┌──────────────────────┐         ┌──────────────────────┐
+                    │      GitHub          │         │     Docker Hub       │
+                    │  deployment.yaml     │         │ thomasrbm/iot_app:v1 │
+                    └──────────┬───────────┘         └──────────┬───────────┘
+                               │                                │
+                               │ git pull                       │ image pull
+                               │ (YAML)                         │ (binaire)
+                               │                                │
+    ═══════════════════════════│════════════════════════════════│═══════════════════════
+    CLUSTER KUBERNETES         │       dans la vm               │
+    (1 seul nœud)              │                                │
+                               │                                │
+    ┌──────────────────────────│────────────────────────────────│────────────────────┐
+    │ NŒUD worker (le container, control-plane + worker)        │                    │
+    │                          │                                │                    │
+    │  ┌───────────────────────▼─────────┐    ┌─────────────────▼──────────────────┐ │
+    │  │  namespace: argocd              │    │  namespace: dev                    │ │
+    │  │  (~5-7 Pods systeme)            │    │  (replicas: 1)                     │ │
+    │  │                                 │    │                                    │ │
+    │  │  ┌───────────────────────────┐  │    │  ┌──────────────────────────────┐  │ │
+    │  │  │  argocd-server            │  │    │  │  Pod iot-app                 │  │ │
+    │  │  └───────────────────────────┘  │    │  │                              │  │ │
+    │  │  ┌───────────────────────────┐  │    │  │   container: nginx           │  │ │
+    │  │  │  argocd-repo-server       │──┼───►│  │   port: 80                   │  │ │
+    │  │  └───────────────────────────┘  │    │  │                              │  │ │
+    │  │  ┌───────────────────────────┐  │    │  └──────────────────────────────┘  │ │
+    │  │  │  argocd-application-ctrl  │  │    │                                    │ │
+    │  │  └───────────────────────────┘  │    │                                    │ │
+    │  │                                 │    │                                    │ │
+    │  │       (+ redis, dex, etc.)      │    │                                    │ │
+    │  └─────────────────────────────────┘    └────────────────────────────────────┘ │
+    │                                                                                │
+    │  ┌──────────────────────────────────────────────────────────────────────────┐  │
+    │  │  namespace: kube-system  (CoreDNS, kube-proxy, etc. - ~3-4 Pods)         │  │
+    │  └──────────────────────────────────────────────────────────────────────────┘  │
+    │                                                                                │
+    └────────────────────────────────────────────────────────────────────────────────┘
+
+1.  namesapce argo cd manuellement :  kubectl create namespace argocd
+tous les pods sont cree auto par ArgoCD
+
+2. le namepspace dev : argocd-application.yaml  (dans /conf)
+
+
+
+
+============ ARGOCD 
+argocd-repo-server lit github :  gitclone le projet
+argocd-app-controller : fait une diff 
+
+deployment.yaml
+service.yaml
+
+
+si changement ArgoCD evnoit les Yaml a API K8S 
+
+  kubectl apply -f deployment.yaml
+  kubectl apply -f service.yaml
+
+
+kube-apiserver stocke dans la base etcd
+
+============================= k3d 
+
+
+au setup.sh 
+
+ sh lance une cmd k3d  qui 
+run un docker dans   rancher/k3s
+
+k3d-mycluster-server-0
+
+cree le docker
+
+
+DANS ce container, k3s démarre tout seul
+
+
+le cluster est vide
+
+
+============================= suite du .sh
+
+ ├── kubectl create namespace argocd  => namespace avec les pods 
+
+
+
+
+
+ kubectl apply -f argocd-application.yaml  lance le yaml qui va cree 
+ le 2e namepspace 
+
+
+========================= comment l image tourne : 
+
+
+
+donc k8s pull l image  dans namespace dev
+dans le pod iot.
+il lance nginx sur port 80.
+le dockerfile qui a lauched nginx copie le code de la page dans 
+le dossier share de nginx 
+
+nginx propose ce code sur le port 
+
+
+
+
+concretement namespace nest meme pas un fichier
+c est plus une route comme dans le backend pour identifier
+pour k8s ou aller chercher quoi. 
+
+
+
+
+
+
+donc tout est sur la vm rien bouge de la vm et k8s fait que 
+ecrire des routes dans etcd (db) qui correspondent aux vrais 
+fichier de la vm. 
 
 
