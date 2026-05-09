@@ -1,0 +1,39 @@
+# argoproj.io = groupe API ArgoCD
+# v1alpha1 alpha stable mainly utilise
+apiVersion: argoproj.io/v1alpha1
+
+# kind = type dobjet. (central dans argocd)
+# kubernetes a deja = Pod, Deployment, Service, ConfigMap, Namespace
+# argo add : Application (repo), AppProject (plusieurs app), etc
+kind: Application
+# toutes les meta data pour id la "ressource"
+metadata:
+  name: catphoto #nom vue dans l UI argo
+  namespace: argocd # dossier logique separe les env de travaille
+  # ici c est celui du controleur qui watch
+# config de ce qui va etre fait
+spec:
+  # regles de l app, perms par defaut
+  project: default
+  source:
+    repoURL: https://github.com/Thomasrbm/IoT_Watched_by_ArgoCD_42.git # a watch
+    targetRevision: HEAD # suit la dernier maj
+    path: . # endroit des .yaml k3s
+  
+  # (le cluster ou maj depuis le github vers l app + namespace cible)
+  destination:
+    server: https://kubernetes.default.svc # build la ou il est (sa propre vm/docker server)
+    namespace: dev # fichier  la oui il "build"
+
+  syncPolicy:
+    # automated = ArgoCD applique tout seul sans que tu cliques sur "Sync"
+    # Sans ce bloc, faudrait sync manuellement à chaque commit
+    automated:
+      # Sans prune, les suppr ressources restent dans le cluster meme si plus dans le repi
+      prune: true
+      # modif du cluster AUSSI vont faire une maj vers le repo
+      selfHeal: true
+    syncOptions:
+      # Si le namespace "dev" n'existe pas, ArgoCD le crée tout seul.
+      # sinon ca fait "namespace not found" si pas ce param et que pas le namsp
+      - CreateNamespace=true
