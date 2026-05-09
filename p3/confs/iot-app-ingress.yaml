@@ -1,0 +1,37 @@
+# ce fichier vit dans p3/confs/ et pas dans le repo Github watche
+# par ArgoCD
+
+# ArgoCD ne tracke que les ressources qu il a deployees lui-meme
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iot-app-ingress
+  namespace: dev
+# ce qu on veut qu il fasse
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix # tout ce qui commence par / /login, /api/users etc.
+            backend: # attrape toutes les routes / et redirige vers 
+              service:
+                name: iot-app # ce service 
+                port:
+                  number: 80 # port du service
+
+
+# par defaut app pas joignable (hors cluster)
+# ingress rend accessible tout le cluster et redirige selon chemin
+# ici tout les chemin mene a  lapp
+
+
+# localhost:8888
+# k3d mappe 8888 → port 80 du load balancer k3d
+
+# docker donne les octet (avec requete get et route / dedans)
+
+# Traefik (Ingress Controller) ecoute le 80 du cluster k3d
+# a la requete
+
+# envoit vers le service sur port 80 du service et non du cluster 
