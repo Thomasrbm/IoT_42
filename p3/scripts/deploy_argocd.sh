@@ -11,7 +11,8 @@
 #  5) On apply notre Application => ArgoCD cree le namespace "dev" et
 #     deploie iot-app dedans en pullant deployment.yaml + service.yaml depuis
 #     le repo GitHub IoT_Watched_by_ArgoCD_42
-#  6) On affiche le mot de passe admin + comment se connecter a l UI
+#  6) On apply l Ingress qui route localhost:8888/ vers svc/iot-app
+#     (le recap final + port-forward ArgoCD est gere par le Makefile)
 
 set -euxo pipefail
 
@@ -61,18 +62,40 @@ kubectl get namespace "${ARGOCD_NS}" >/dev/null 2>&1 || \
 
 
 
-# ============= 3. Install ArgoCD 
+# ============= 3. Install ArgoCD
 # Manifest officiel = ~50 ressources (Deployments, Services, ConfigMaps, RBAC, CRDs)
 # -n argocd : tout va dans le namespace argocd
 # stable    : derniere version stable taggee par le projet ArgoCD
 # -f  :  fetch url
+
+# de base kubectl apply est client side et stock une copie du yaml dans kubectl.kubernetes.io/last-applied-configuration
+# mais argocd a des objets enorme et full la anotation d un coup
+
+
+
+# --server-side : evite l erreur "metadata.annotations: Too long"
+#   applicationsets.argoproj.io 
+
+# --------------------------
+
+# en server side l api retient qui modif quoi (quelle ligne du yaml (plutot "champs" = indentation))
+# kubectl quand on fait apply
+# argocd etc,
+
+# le champs est au modificateur
+
+# si un autre service modif le champ y a conflit 
+
+# --force-conflicts : modifie quand meme
 echo "Installation ArgoCD dans le namespace '${ARGOCD_NS}'..."
-kubectl apply -n "${ARGOCD_NS}" \
+kubectl apply --server-side --force-conflicts -n "${ARGOCD_NS}" \
   -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 
 
 # ====================== 4. Attendre que ArgoCD soit pret
+# deploit les pods argoCD
+
 # wait --for=condition=available : bloque jusqu a ce que le Deployment ait
 # le minimum de replicas Ready (sinon le apply de l Application va planter
 # car les CRDs argo ne sont peut etre pas encore enregistres dans l API)
@@ -96,46 +119,27 @@ kubectl rollout status -n "${ARGOCD_NS}" statefulset/argocd-application-controll
 
 
 
-# ====================== 5. Apply notre Application 
+# ====================== 5. Apply notre Application
 # applique le manifest dans conf pour watch le repo github
 echo "Apply de l Application ArgoCD (${APP_MANIFEST})..."
 kubectl apply -f "${APP_MANIFEST}"
 
 
+# ====================== 6. Ingress iot-app
+# une fois apply fait on appel ingress pour avoir les routes d acces. 
+INGRESS_MANIFEST="$SCRIPT_DIR/../confs/iot-app-ingress.yaml"
+echo "Attente du service iot-app dans le namespace ${APP_NS}..."
+for i in $(seq 1 60); do
+  if kubectl get svc -n "${APP_NS}" iot-app >/dev/null 2>&1; then
+    break
+  fi
+  sleep 2
+done
+echo "Apply de l Ingress iot-app (${INGRESS_MANIFEST})..."
+kubectl apply -f "${INGRESS_MANIFEST}"
 
-# ====================== 6. Recap + acces UI
-# Le mot de passe admin initial est dans un secret K8s genere au boot
-# data.password est encode en base64, on decode pour l afficher
 
-# cmd pour get tout les secret info du ns :  get secret argocd-initial-admin-secret
-
-# -n pour namespace
-# -o pour format output en json ici
-# .data.password extrait que le mdp
-
-#  2>/dev/null stderr vers la trash
-#  base64 -d   decode le mdp base 64 en claire  
-ADMIN_PWD=$(kubectl -n "${ARGOCD_NS}" get secret argocd-initial-admin-secret \
-  -o jsonpath="{.data.password}" 2>/dev/null | base64 -d || echo "(mdp does not exist)")
 
 echo ""
-echo "=========================================="
-echo " Setup termine !"
-echo "=========================================="
-echo ""
-echo "ArgoCD UI :"
-echo "  kubectl port-forward -n ${ARGOCD_NS} svc/argocd-server 8080:443"
-echo "  -> https://localhost:8080  (login: admin / pwd: ${ADMIN_PWD})"
-echo ""
-echo "App iot-app (apres sync d ArgoCD) :"
-echo "  kubectl port-forward -n ${APP_NS} svc/iot-app 8888:80"
-echo "  -> http://localhost:8888"
-echo ""
-echo "Verifier l etat :"
-echo "  kubectl get pods -n ${ARGOCD_NS}"
-echo "  kubectl get pods -n ${APP_NS}"
-echo "  kubectl get application -n ${ARGOCD_NS}"
-echo ""
-echo "Pour declencher un sync ArgoCD : push v1->v2 dans deployment.yaml"
-echo "du repo IoT_Watched_by_ArgoCD_42, ArgoCD detectera le commit"
-echo "et redeploiera automatiquement (selfHeal + automated)."
+echo "Setup K8s termine. Le Makefile lance le port-forward ArgoCD"
+echo "et affiche les URLs / mot de passe juste apres."
