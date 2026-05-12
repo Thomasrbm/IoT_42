@@ -1,0 +1,67 @@
+
+
+
+les images 
+
+elle install nginx et 
+
+
+Image Layers:
+
+https://hub.docker.com/repository/docker/thomasrbm/iot_app/tags/v2/sha256-f23377780ba8fb6f44a1b43afc192cb63192657f7c1bdcd152b7050662a1d971
+
+1.  ADD alpine-minirootfs-3.23.4-x86_64.tar.gz / # buildk...    3.09 MB
+2.  CMD ["/bin/sh"]                                              0 B
+3.  LABEL maintainer=NGINX Docker Maintainers <docker-maint@n... 0 B
+4.  ENV NGINX_VERSION=1.29.8                                     0 B
+5.  ENV PKG_RELEASE=1                                            0 B
+6.  ENV DYNPKG_RELEASE=1                                         0 B
+7.  RUN /bin/sh -c set -x                                        1.78 MB
+8.  COPY docker-entrypoint.sh / # buildkit                       627 B
+9.  COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint...   956 B
+10. COPY 15-local-resolvers.envsh /docker-entrypoint.d b...      404 B
+11. COPY 20-envsubst-on-templates.sh /docker-entrypoint...       1.18 KB
+12. COPY 30-tune-worker-processes.sh /docker-entrypoint...       1.37 KB
+13. ENTRYPOINT ["/docker-entrypoint.sh"]                         0 B
+14. EXPOSE map[80/tcp:{}]                                        0 B
+15. STOPSIGNAL SIGQUIT                                           0 B
+16. CMD ["nginx" "-g" "daemon off;"]                             0 B
+17. ENV NJS_VERSION=0.9.6                                        0 B
+18. ENV NJS_RELEASE=1                                            0 B
+19. ENV ACME_VERSION=0.3.1                                       0 B
+20. RUN /bin/sh -c set -x                                        19.31 MB
+21. ARG VERSION=v2                                               0 B
+22. COPY v2/index.html /usr/share/nginx/html/index.html ...      1.31 KB
+23. EXPOSE [80/tcp]                                              0 B
+
+
+
+
+argocd yaml watch ce repo
+
+https://github.com/Thomasrbm/IoT_Watched_by_ArgoCD_42/blob/main/deployment.yaml
+
+
+ce repo pull l image iot_app1 de docker 
+
+
+
+on a build les image auparavant donc les fichier index etc
+sont DEJA dans le dockerfile
+
+donc les index y sont inclus deja. 
+
+
+
+
+
+quand on a fait ca : 
+
+docker login
+docker build --build-arg VERSION=v1 -t thomasrbm/iot_app:v1 .
+docker build --build-arg VERSION=v2 -t thomasrbm/iot_app:v2 .
+docker push thomasrbm/iot_app:v1
+docker push thomasrbm/iot_app:v2
+
+
+
