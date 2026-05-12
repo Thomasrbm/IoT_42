@@ -3,6 +3,10 @@ kind: Ingress
 metadata:
   name: web-ingress
   namespace: dev
+
+
+# si la requette envoit vers app1.com
+# envoit vers service preics de app1 qui fait la redir ver le ngninx pod
 spec:
   ingressClassName: traefik
   rules:
@@ -28,6 +32,8 @@ spec:
                 port:
                   number: 80
 
+    # si y a rien ans le http ca renvoit vers app3
+    # curl http://192.168.56.110/
     - http:
         paths:
           - path: /

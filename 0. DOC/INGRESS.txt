@@ -1,0 +1,61 @@
+
+
+
+par defaut   k3s lance un pod  Traefik 
+qui est l ingress controller 
+
+
+dans le namespace kube-system
+
+
+kubectl get pods -n kube-system | grep traefik
+
+
+
+
+il y a un service LoadBalancer  qui expose les routes 80/443
+vers celle du node ( l hote ici )
+
+et donc moi je fait requete https vers local
+host  le load balancer le capte
+
+
+ingress capte que c est pour lui il redirige 
+
+
+
+
+
+
+
+
+
+
+ 1. curl https://app1.com  (résolu en 127.0.0.1 via /etc/hosts)
+
+
+le host name local host redirige vers notre machine
+
+          ↓
+
+
+  2. Paquet arrive sur le node, port 443
+          ↓
+  3. Service Traefik (type LoadBalancer) "possède" ce port
+     → klipper-lb (k3s) crée des règles iptables sur le node
+     → iptables redirige le paquet vers le pod Traefik
+
+
+ingress controller ecoute ce port et redirige
+
+
+          ↓
+  4. Pod Traefik reçoit la connexion TLS, la termine, lit la requête HTTP
+     → voit Host: app1.com
+     → applique la règle Ingress correspondante
+          ↓
+  5. Traefik forward vers le Service app1-service (ClusterIP)
+          ↓
+  6. kube-proxy / iptables load-balance vers un Pod app1
+          ↓
+  7. nginx répond
