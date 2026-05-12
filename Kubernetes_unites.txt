@@ -22,6 +22,9 @@ le deployement = manage les replicaset et gere les mise a jours en douceur ou re
 
 
 
+services = sert a expose une application aux autres ; un entry point.  les pods peuvent bouger, redemarrer et changer d ip ducoup.
+le service sert a etre stable il est pas une unite logique il est plus un post it permanent qui donne ip a tout un groupe de label.
+
 
 namespace = pour separer les equipe sans conflits
 
