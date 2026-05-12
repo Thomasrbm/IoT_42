@@ -36,3 +36,20 @@ nodes  = les machines
 
 cluster = tout les nodes 
 
+
+API =  pour tous les changements de relges ou de maj sur le clsuter, pas forcement pour l echange de donnes navigateur/services.
+
+
+Ingress = ingress controller expose a l exterieur.  il ecoute l exterieur du cluster. 
+  on doit avoir un loadbalancer avec docker hors du cluster il sait qu il doit rediriger tel port vers le ingress controller.
+  l ingress sait qu il doit parler a tel service qui lui dit parle a tel pod pour avoir le ngninx qui 
+
+
+ngninx : sait que si tu veux tel index.html il doit servir depuis tel dossier /var/html  et prendre la bonne page
+
+
+
+
+CI/CD  = 
+          ci integration continue = test auto comme gitlab
+          cd deploiement continue   =  ArgoCD
