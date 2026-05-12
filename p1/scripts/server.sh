@@ -6,11 +6,6 @@ set -euxo pipefail  # -e quitte si plante
 
 
 
-SERVER_IP="${SERVER_IP:-192.168.56.110}" # use server ip sinon fall back sur ip de droite
-
-
-
-
 apt-get update -y || true # maj packet si erreur true skip l erreur
 apt-get install -y curl 
 

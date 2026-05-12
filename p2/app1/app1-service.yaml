@@ -9,3 +9,20 @@ spec:
   ports:
     - port: 80
       targetPort: 80
+
+
+#  cree IP interne stable + un nom DNS (app1-service.dev)
+# ip interne au cluster
+
+# le service peut pas etre down c est une etiquette.
+# mais si un deployement est down le service 
+
+# redirigera auto car on creera le nouveau depliyement avec
+# le meme selector app1
+
+
+# n est pas rattache a un pod ni rien
+
+
+# le port est donc le port du service pas d autre chose
+# et il renvoit vers le port 80 du deployement

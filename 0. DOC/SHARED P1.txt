@@ -1,0 +1,70 @@
+
+
+le k3s.yaml.
+
+
+cest le fichier qui permet a kubectl de parler au cluster
+
+
+
+k3s.yaml y en a qu un. c est le nom par defaut mais importe
+pas c est les routes qui importe
+
+
+kubectl c est un client http  il cherche toujours son fichier 
+
+
+
+
+======== les routes :
+
+
+
+
+Le flag --kubeconfig
+kubectl --kubeconfig=/vagrant/shared/k3s.yaml get nodes
+
+
+export KUBECONFIG=/vagrant/shared/k3s.yaml
+kubectl get nodes
+
+Le fichier par défaut ~/.kube/config
+
+
+
+
+
+========  
+
+
+
+pk il a besoin de ce yaml ?
+ 
+ 
+le server c est le control plane :
+et donc la ou il y a l api server.
+
+
+donc il va get l ip ou demader ces chose pour faire sa requete
+
+
+sur  https://192.168.56.110:6443
+
+
+
+
+===================  node token
+
+
+c est le mdp pour les workers 
+
+pour la premiere connetion.
+
+
+le cert pour kubectl est cree en meme temps que le server
+mais pas celui des worker car on sait pas a l
+avance combien y en aura etc
+
+
+le serveur ne peut pas etre au courrant de l existence des autres
+workers 
