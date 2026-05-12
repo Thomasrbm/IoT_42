@@ -1,5 +1,145 @@
 
 
+
+
+
+Geres des machines (nodes) vm ou reel et les containeru dedans.
+
+si crash, redemarre,
+su machine meurt, containers migrent ailleurs
+rendre accessible depuis l exterieur les contenue.
+maintir des copies des apps.
+
+
+
+
+
+========================================================
+
+Kubernetes coded en go.
+
+
+
+================= ETCD  la memoire
+
+le etcd  (vient du /etc du pc + d pour distributed)
+=> stock des   clefs/valeurs
+
+
+    clefs                                            valeurs
+
+/registry/<resource>/<namespace>/<name>     <blob Protobuf du Pod web-abc123>
+
+
+
+
+
+le blob c est le yaml de l objet pod. 
+
+kind: Pod
+apiVersion: v1
+
+metadata:
+  name: web-abc123      etc.
+
+
+
+
+
+
+ca dit comment est tel ou tel pods.
+
+
+avec une requete kubectl get sur la clef tu as l etat
+
+
+
+
+================= kube-apiserver
+
+
+
+tout passe par la  API REST 
+
+
+
+client → POST /apis/apps/v1/namespaces/default/deployments
+                              │
+                              ▼
+              ┌───────────────────────────────┐
+              │  1. Authentication            │  qui es-tu ? (cert, token, OIDC)
+              │  2. Authorization (RBAC)      │  as-tu le droit ?
+              │  3. Admission control         │  modifier/rejeter la requête
+              │  4. Validation du schéma      │  le YAML est valide ?
+              │  5. Écriture dans etcd        │  Put(/registry/...)
+              │  6. Réponse au client         │
+              └───────────────────────────────┘
+
+
+
+en gros le user voit des requetes et de demande de modif de yaml
+
+
+=================  Kubelet =====>  du yaml au code.
+
+
+=================  UPDATE STATUS API
+
+kubectl apply -f deployment.yaml
+
+
+
+kubctl lit yaml converti en json
+POST sur l api 
+
+
+
+API authentifie 
+
+
+
+convertie json en protobuf binaire (pour que pc le lise)
+
+
+ecrit le stockage dans etcd. 
+
+
+reponse ok 
+
+
+================= PARLE A CONTAINERD   CMD k3d cluster create
+
+
+containerd est le dameon linux 
+
+
+docker passe mtn par lui et les autre containerisation.
+
+
+kubelet lance la commande pour le container
+
+
+
+
+
+
+le namespace argocd dans le ymal laucnh aussi 7 container
+avec pour tag(namespace) argocd
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================
+
 Projet open source qui definit : 
 
 

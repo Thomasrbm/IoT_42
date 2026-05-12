@@ -1,0 +1,71 @@
+┌───────────────────────────────────────────────────────────────────┐
+│                    HÔTE LINUX (ta machine)                        │
+│                                                                   │
+│   🌐 Navigateur                                                    │
+│      │                                                            │
+│      ├─ :8888 ──► iot-app                                         │
+│      └─ :8080 ──► ArgoCD UI                                       │
+│         │              │                                          │
+│         │   (les 2 passent par l'Ingress Traefik)                 │
+│         ▼              ▼                                          │
+│  ┌────────────────────────────────────────────────────────┐       │
+│  │                  DOCKER ENGINE                         │       │
+│  │                                                        │       │
+│  │  ┌──────────────┐      ┌────────────────────────────┐  │       │
+│  │  │  CONTAINER   │ ───► │  CONTAINER k3d-server-0    │  │       │
+│  │  │  serverlb    │      │  (image: rancher/k3s)      │  │       │
+│  │  │  (nginx LB)  │      │                            │  │       │
+│  │  │  :8888 →:80  │      │  ┌──────────────────────┐  │  │       │
+│  │  │  :8080 →:80  │      │  │  CLUSTER K8s         │  │  │       │
+│  │  └──────────────┘      │  │  api-server, etcd,   │  │  │       │
+│  │                        │  │  scheduler, kubelet, │  │  │       │
+│  │                        │  │  containerd          │  │  │       │
+│  │                        │  └──────────────────────┘  │  │       │
+│  │                        │                            │  │       │
+│  │                        │  ┌─[ns: kube-system]────┐  │  │       │
+│  │                        │  │  POD traefik         │  │  │       │
+│  │                        │  │  (Ingress Controller)│  │  │       │
+│  │                        │  │                      │  │  │       │
+│  │                        │  │  Ingress rules:      │  │  │       │
+│  │                        │  │   host A → SVC dev   │  │  │       │
+│  │                        │  │   host B → SVC argocd│  │  │       │
+│  │                        │  └──────┬───────┬───────┘  │  │       │
+│  │                        │         │       │          │  │       │
+│  │                        │         ▼       ▼          │  └────┐  │
+│  │                        │  ┌─[ns:dev]──┐ ┌─[ns:argocd]─────┐ │  │       
+│  │                        │  │ SVC       │ │ SVC             │ │  │       
+│  │                        │  │ iot-app   │ │ argocd-server   │ │  │       
+│  │                        │  │  │        │ │  │              │ │  │       
+│  │                        │  │  ▼        │ │  ▼              │ │  │       
+│  │                        │  │ POD       │ │ PODS:           │ │  │       
+│  │                        │  │ iot-app   │ │ • server        │ │  │       
+│  │                        │  │ (nginx)   │ │ • redis • dex   │ │  │       
+│  │                        │  │           │ │ • appset        │ │  │       
+│  │                        │  │           │ │ • app-controller│ │  │       
+│  │                        │  │           │ │ • repo-server   │ │  │
+│  │                        │  │           │ └─────────┼───────┘ │  │   
+│  │                        │  │           │           │         │  │
+│  │                        │  └───────────┘           │         │  │
+│  │                        └──────────────────────────┼─────────┘  │  
+│  └───────────────────────────────────────────────────┼────────────│   
+└──────────────────────────────────────────────────────┼────────────┘
+                                                       │
+                                            pull (HEAD)│
+                                                       ▼
+                                ┌──────────────────────────────┐
+                                │  GitHub                      │
+                                │  IoT_Watched_by_ArgoCD_42    │
+                                │  (deployment + service yaml) │
+                                └──────────────────────────────┘
+
+
+
+
+Cluster = les processus en cours en arriere plan sur la machine  (k8s, etcd, scheduler etc)
+    processus du server (control plane)
+
+c est un container docker classique    image : rancher/k3s  ==> launch par k3d 
+
+
+namespace = tag logique pour la db
+
