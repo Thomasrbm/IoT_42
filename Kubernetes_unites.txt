@@ -1,0 +1,35 @@
+
+
+philosiphie : decrire l etat voulue en yaml et unite d abstraction logique et k8s va faire en sorte de s en rapprocher le plus possible en permanence 
+
+
+Unites de bases
+
+
+
+Pod  = unite de base. ce qu on veut obtenir. par exemple  un serveur web nginx  avec un port.  et un autre service qui s occupe des logs
+mais pourrait pas avoir deux serveur web ecoutant le meme port car un pod a 1 seul ip et un nombre limite de port. 
+
+il est une seul unite reseau. donc un ip et des ports.  meme si a plusieurs container lui peut pas rediriger un port vers deux services different donc limite la dessus.
+
+
+
+replicaset = lui il va decrire le nombre de copie du pod en permanence maintenu 
+
+
+
+le deployement = manage les replicaset et gere les mise a jours en douceur ou revenir a version precedentes.
+
+
+
+
+namespace = pour separer les equipe sans conflits
+
+
+
+nodes  = les machines
+
+
+
+cluster = tout les nodes 
+
