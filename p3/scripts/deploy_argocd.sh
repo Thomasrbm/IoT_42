@@ -113,6 +113,7 @@ done
 #              argocd-dex-server argocd-applicationset-controller;
 
 # sinon timout = script plante
+# statefull set = synchro avec la db securite pour pas avoir double db info, double brain
 kubectl rollout status -n "${ARGOCD_NS}" statefulset/argocd-application-controller \
   --timeout=300s \
   || { echo "[ERROR] argocd-application-controller not Ready apres 300s -> abort"; exit 1; }
