@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: gitlab/gitlab-ce:latest
+          # va chercher son env de config via le yaml
+          envFrom:
+            - configMapRef:
+                name: gitlab-config
+          ports:
+            - containerPort: 80
+
+          # resources : on declare ce que le pod consomme.
+          # requests = ce qu il a TOUJOURS de garanti (K8s reserve)
+          # limits   = le plafond max (au dessus -> K8s peut le tuer)
+          resources:
+            requests:
+              memory: "1.5Gi"
+              cpu: "300m"          # 300m = 0.3 CPU
+            limits:
+              memory: "3Gi"
+              cpu: "2000m"         # max 2 CPU si dispo
+          # readinessProbe : K8s teste regulierement si GitLab est PRET.
+          # tant que la probe echoue, le pod existe mais le Service ne route PAS vers lui.
+          readinessProbe:
+            httpGet:
+              path: /-/readiness   # endpoint officiel de GitLab pour le healthcheck
+              port: 80
+            initialDelaySeconds: 180   # on attend 3 min avant de commencer a tester
+            periodSeconds: 30          # on retest toutes les 30s
+            timeoutSeconds: 10
+            failureThreshold: 30       # max 30 echecs avant de declarer "not ready"
+                                       # -> tolerance totale : 180 + 30*30 = 1080s = 18 min
+
+
+          # on monte le PVC dans le pod : "/var/opt/gitlab" sera persistant
+          # besoin par rapport a github car ici on est sur un pod et non sur un repo persistant en cloud.
+          volumeMounts:
+            - name: data            # nom logique du volume
+              mountPath: /var/opt/gitlab # le fs pour acceder depuis le container mais vrai fichier est sur la vm (en dessous)
+      # liste des volumes dispo dans ce pod, qu on peut "monter" dans les containers
+      volumes:
+        - name: data                # nom pour le cluster
+          persistentVolumeClaim:
+            claimName: gitlab-data  # nom pour la VM
+
+# service ecrit dans le meme yaml. 
+# pour github y avait pas besoin de service car il etait hors cluster donc on captait avec argoCD via HTTP
+# donc le pod du gitlab peut redemmarer et changer dip, pas github donc ici service,.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+# K8s va automatiquement creer un PV (PersistentVolume) qui matche cette demande
+# le PV pointera vers un vrai dossier sur le node k3d (genre /var/lib/rancher/k3s/storage/...)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-data
+  namespace: gitlab
+spec:
+  accessModes:
+    - ReadWriteOnce      # un seul pod peut ecrire dedans a la fois
+  resources:
+    requests:
+      storage: 5Gi       # taille
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitlab-ingress
+  namespace: gitlab
+spec:
+  rules:
+    - host: gitlab.localhost    # nouveau nom de sous domaine localhost pour pas interferer avec le ingress de l app qui match localhost par defaut.
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitlab
+                port:
+                  number: 80

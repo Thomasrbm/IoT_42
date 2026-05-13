@@ -20,7 +20,8 @@ spec:
     spec:
       containers:
         - name: app2
-          image: app2-web
+          image: app2-web # celle qu on a build  avec    docker build -t app2-web ./app2
+          # elle est stocker en local avec le.tar  
           imagePullPolicy: Never
           ports:
             - containerPort: 80

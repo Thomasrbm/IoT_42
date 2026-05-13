@@ -1,0 +1,13 @@
+
+
+Persistent volume claim
+
+
+cest un bout de disque qui survit au pode un peut comme les volume de container qui survive au docker down.
+
+
+
+exemple gitlab cree une db potstree, un repo pour l application et le compte root.
+
+
+si on redebarre le /var/opt/gitlab ou y a tout serait vide. donc on cree un volume

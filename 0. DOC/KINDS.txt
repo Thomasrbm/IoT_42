@@ -1,0 +1,12 @@
+
+
+
+les types d objet argoCD et donc les possibilites qui en decoule:
+
+
+
+les services : interface ip constante pour pod qui eux peuvent changer
+deployement  : permet redoploiement fluide et maj 
+Ingress      : routing depuis exterieur vers service internes aux docker
+Applications : pour les custom ressource non native a k8s.
+replicaset   : maintient juste nombre de pod precis 

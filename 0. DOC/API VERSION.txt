@@ -1,0 +1,25 @@
+le programme api server a plusieur endpoint pour repartir l organisation.
+api version sert a orienter ces endpoint.
+
+
+
+
+api/v1                       = core  les pods, services
+apps/v1                      = groupe apps  (deployement, replicaset etc.)
+apis/networking.k8s.io/v1/   = network 
+apis/argoproj.io/v1alpha1/   = groupe ArgoCD
+
+
+
+
+permet de faire evoluer independmment les version dapi 
+
+
+
+api de base peut rester stable et la meme niveau requetes etc
+mais celle d argoCD encore en dev peut evoluer 
+
+
+plus lisible askip
+
+

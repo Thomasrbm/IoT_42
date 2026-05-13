@@ -1,0 +1,43 @@
+
+# de base gitlab en plusieurs serivce.
+# gitlab/gitlab-ce:latest = la distribution Omnibus packagée en container.
+
+apiVersion: v1
+kind: ConfigMap # pour les ficheir de config
+metadata:
+  name: gitlab-config
+  namespace: gitlab
+
+# "data" = paires cle/valeur.
+# Quand le Deployment fait envFrom, chaque cle ici devient une variable d env
+data:
+  GITLAB_OMNIBUS_CONFIG: |
+    # sera l URL interne du gitlab 
+    external_url 'http://gitlab.gitlab.svc.cluster.local'
+    nginx['listen_port'] = 80
+
+    # password root +  s affiche pas en terminal ni log
+    gitlab_rails['initial_root_password'] = 'changeme123'
+    gitlab_rails['display_initial_root_password'] = false
+
+    # ---- on coupe tou les truc useless pour lean le gitlab sinon tient pas en ram de petite vm  ----
+    prometheus_monitoring['enable'] = false
+    alertmanager['enable'] = false
+    node_exporter['enable'] = false
+    redis_exporter['enable'] = false
+    postgres_exporter['enable'] = false
+    gitlab_exporter['enable'] = false
+    grafana['enable'] = false
+    mattermost['enable'] = false
+    registry['enable'] = false
+    gitlab_pages['enable'] = false
+
+    # ---- on reduit les processus de base du gitlab : puma = gere la page login,  0 fait 1 thread minimal,  sidekiq = file d attente, la db postrgres ram et connexion ----
+    # 
+    puma['worker_processes'] = 0
+    sidekiq['max_concurrency'] = 5
+    postgresql['shared_buffers'] = "128MB"
+    postgresql['max_connections'] = 100
+
+    # on conserve aucune backup
+    gitlab_rails['backup_keep_time'] = 0

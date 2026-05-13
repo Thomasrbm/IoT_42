@@ -15,15 +15,16 @@ metadata:
 spec:
   # regles de l app, perms par defaut
   project: default
-  # d ou vient le code a deployer
   source:
-    repoURL: https://github.com/Thomasrbm/IoT_Watched_by_ArgoCD_42.git # a watch
+    # ArgoCD vit dans le cluster -> il atteint GitLab via le DNS interne K8s
+    # (gitlab = nom du Service, gitlab = namespace, svc.cluster.local = suffixe DNS standard)
+    # le projet "root/iot-app" sera cree par le script deploy_bonus.sh via l API GitLab
+    repoURL: http://gitlab.gitlab.svc.cluster.local/root/iot-app.git
     targetRevision: HEAD # suit la dernier maj
     path: . # endroit des .yaml k3s
   
   # (le cluster ou maj depuis le github vers l app + namespace cible)
   destination:
-  #  api interne a k8 dit va deploy dans le cluster ou il est
     server: https://kubernetes.default.svc # build la ou il est (sa propre vm/docker server)
     namespace: dev # fichier  la oui il "build"
 

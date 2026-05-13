@@ -1,0 +1,7 @@
+
+
+
+les deployement servent a ce que les replicas ne se down pas tous en meme temps lors d un changement de version
+
+
+1 replicas se down, 1 autre se up avec la new maj.  les new croissent petit  a petit pdt que les olds decroissent

@@ -1,0 +1,8 @@
+
+
+
+services servent aux load balencing et surtout aux ip forward.
+
+
+le kubeproxy geres les redirection et prend pour ip de passage celle du service qui elle va rediriger 
+vers l ip reel du replicas

@@ -32,8 +32,8 @@ K3S_TOKEN="$(cat /vagrant/shared/node-token)"
 
 # k3s mode agent
 curl -sfL https://get.k3s.io | \
-  K3S_URL="https://${SERVER_IP}:6443" \ 
-  K3S_TOKEN="${K3S_TOKEN}" \ 
+  K3S_URL="https://${SERVER_IP}:6443" \
+  K3S_TOKEN="${K3S_TOKEN}" \
   sh -s - agent \
     --node-ip="${WORKER_IP}" \
     --flannel-iface=eth1

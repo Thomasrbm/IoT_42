@@ -9,7 +9,6 @@ metadata:
   namespace: dev
 # ce qu on veut qu il fasse
 spec:
-  # contrairement a spec qui est comment a tous les kind. rules c est que pour certains
   rules:
     - http:
         paths:
