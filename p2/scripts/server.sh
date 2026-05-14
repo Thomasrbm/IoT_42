@@ -46,7 +46,18 @@ kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f /vagrant/app1/
 kubectl apply -f /vagrant/app2/
 kubectl apply -f /vagrant/app3/
-kubectl apply -f /vagrant/k8s/
+kubectl apply -f /vagrant/confs/
+
+# Set "dev" as the default namespace, so that the evaluator's plain
+# `kubectl get all` (without -n) shows the three apps as required by the
+# subject. We update both the system kubeconfig (used by k3s' kubectl wrapper)
+# and provision one for the vagrant user, to cover any kubectl path.
+kubectl config set-context --current --namespace=dev
+
+mkdir -p /home/vagrant/.kube
+cp /etc/rancher/k3s/k3s.yaml /home/vagrant/.kube/config
+chown -R vagrant:vagrant /home/vagrant/.kube
+chmod 600 /home/vagrant/.kube/config
 
 kubectl -n dev rollout status deploy/app1 --timeout=180s
 kubectl -n dev rollout status deploy/app2 --timeout=180s
