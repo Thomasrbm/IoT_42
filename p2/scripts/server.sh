@@ -24,7 +24,14 @@ done
 
 echo "=== K3s ready ==="
 
-kubectl -n kube-system rollout status deploy/traefik --timeout=180s
+# Traefik is installed by helm-controller asynchronously — the Deployment
+# doesn't exist immediately after the node is Ready. Wait for it to appear
+# before checking its rollout status.
+until kubectl -n kube-system get deploy/traefik >/dev/null 2>&1; do
+  sleep 2
+done
+
+kubectl -n kube-system rollout status deploy/traefik --timeout=300s
 
 for tar in /vagrant/app1/app1-web.tar \
            /vagrant/app2/app2-web.tar \
