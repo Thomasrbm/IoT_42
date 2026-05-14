@@ -1,0 +1,19 @@
+
+
+
+il est auto heberger sur tes machines et tes servers.
+
+
+
+cest comme github sinon.
+
+
+
+
+
+avec des outils en plus pour la CI/CD : 
+
+- auto devops sans ecrire de yaml
+- built in tableau de gestion de projet style trello etc.
+etc.
+
