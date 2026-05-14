@@ -37,7 +37,7 @@ up:
 	@echo "                  kubectl get application -n $(ARGOCD_NS)"
 	@echo ""
 	@echo "  Test GitOps   : push v1->v2 dans deployment.yaml du repo"
-	@echo "                  IoT_Watched_by_ArgoCD_42, ArgoCD redeploiera auto."
+	@echo "                  throbert_IoT_Watched_by_ArgoCD_42, ArgoCD redeploiera auto."
 	@echo ""
 	@echo "================================================================"
 

@@ -69,35 +69,60 @@ curl -H "Host: random.com" http://192.168.56.110/
 
 
 # ======================================  P3
-# vérifier projet
-cd ../p3 && ls
+
 
 # namespaces
 kubectl get ns
 
-# pods argocd
+
+
+
 kubectl get pods -n argocd
 
-# pods dev
 kubectl get pods -n dev
 
-# resources dev
+
+
+
 kubectl get all -n dev
 
+
+
+
+
+
 # argocd ui
-kubectl port-forward svc/argocd-server -n argocd 8080:443 && https://localhost:8080
+https://localhost:8080
+
+
+
+
+
+kubectl get svc -n argocd
+
+
+
+
+
 
 # argocd password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 
-# test app
-curl localhost
 
-# git update
-git add . && git commit -m "update v2" && git push
 
-# verify update
-kubectl get pods -n dev && curl localhost
+user : admin
+mdp : le truc cat
 
-# debug cluster
-kubectl get pods -A && kubectl describe pod <pod> && kubectl logs <pod> && kubectl get events && kubectl get deployments && kubectl get svc && kubectl get ingress && kubectl delete pod <pod>
+
+
+
+
+
+
+http://localhost:8888
+
+
+
+
+
+# =============================   BONUS

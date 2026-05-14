@@ -10,7 +10,7 @@
 #  4) On attend que tous les pods argocd soient Ready
 #  5) On apply notre Application => ArgoCD cree le namespace "dev" et
 #     deploie iot-app dedans en pullant deployment.yaml + service.yaml depuis
-#     le repo GitHub IoT_Watched_by_ArgoCD_42
+#     le repo GitHub throbert_IoT_Watched_by_ArgoCD_42
 #  6) On apply l Ingress qui route localhost:8888/ vers svc/iot-app
 #     (le recap final + port-forward ArgoCD est gere par le Makefile)
 

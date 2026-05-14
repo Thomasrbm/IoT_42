@@ -77,7 +77,7 @@ kubectl run gitlab-init-push --rm -i --restart=Never \
   --namespace="${GITLAB_NS}" \
   --command -- sh -c '
     set -e
-    git clone https://github.com/Thomasrbm/IoT_Watched_by_ArgoCD_42.git /tmp/src
+    git clone https://github.com/Thomasrbm/throbert_IoT_Watched_by_ArgoCD_42.git /tmp/src
     cd /tmp/src
     git remote add gitlab http://root:changeme123@gitlab.gitlab.svc.cluster.local/root/iot-app.git
     git push gitlab HEAD:main --force

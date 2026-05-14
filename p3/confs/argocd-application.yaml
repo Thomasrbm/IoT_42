@@ -17,7 +17,7 @@ spec:
   project: default
   # d ou vient le code a deployer
   source:
-    repoURL: https://github.com/Thomasrbm/IoT_Watched_by_ArgoCD_42.git # a watch
+    repoURL: https://github.com/Thomasrbm/throbert_IoT_Watched_by_ArgoCD_42.git # a watch
     targetRevision: HEAD # suit la dernier maj
     path: . # endroit des .yaml k3s
   
